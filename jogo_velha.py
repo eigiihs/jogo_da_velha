@@ -7,10 +7,20 @@ tabuleiro = [
 jogadas = 1
 jogador = 'X'
 play = True
+posicoes_validas = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'}
 
 def show_tabuleiro():
     for i in range(3):
-        print(tabuleiro[i])
+        print(' | '.join(tabuleiro[i]))
+        if i < 2:
+            print('-' * 9)
+
+def reset_tabuleiro():
+    return [
+    ['a', 'b', 'c'],
+    ['d', 'e', 'f'],
+    ['g', 'h', 'i']
+    ]
 
 def verify_vencedor():
     # verifica as linhas
@@ -30,11 +40,19 @@ def verify_vencedor():
 
     return False 
 
+def realizar_jogada(position, jogador):
+    for linha in range(3):
+                for coluna in range(3):
+                    if tabuleiro[linha][coluna] == position:
+                        tabuleiro[linha][coluna] = jogador
+                        return True
+    return False
+
 def menu():
     global play
     global jogadas
     global tabuleiro
-    print(f'---- MENU INICIAL ----')
+    print(f'\n---- MENU INICIAL ----')
     print(f'1 - Jogar novamente')
     print(f'2 - Finalizar')
     print(f'-----------------------')
@@ -44,38 +62,30 @@ def menu():
         play = False
     else: 
         jogadas = 1
-        tabuleiro = [
-            ['a', 'b', 'c'],
-            ['d', 'e', 'f'],
-            ['g', 'h', 'i']
-        ]
+        tabuleiro = reset_tabuleiro()
     
 while play: 
 
-    while jogadas < 10:
-        print(f'Rodada: {jogadas}')
-
+    while jogadas <= 9:
+        print(f'\nRodada: {jogadas}')
         show_tabuleiro()
 
         position = input(f'{jogador} - Insira a posição: ')
-        if position != 'a' and position != 'b' and position != 'c' and position != 'd' and position != 'e' and \
-            position != 'f' and position != 'g' and position != 'h' and position != 'i':
-            print('-Posição não encontrada!-')
-            print('-Digite novamente!-')
-        else: 
-            jogada_realizada = False
-            for linha in range(3):
-                for coluna in range(3):
-                    if tabuleiro[linha][coluna] == position:
-                        tabuleiro[linha][coluna] = jogador
-                        jogada_realizada = True
-        
+        if position not in posicoes_validas:
+            print('-Posição não encontrada! Digite novamente! -')
+         
+        if realizar_jogada(position, jogador):
             if verify_vencedor():
                 show_tabuleiro()
-                print(f'{jogador} Venceu!!')
+                print(f'\n{jogador} Venceu!!')
                 menu()
                 break 
 
-            if jogada_realizada == True:
-                jogadas += 1
-                jogador = 'O' if jogador == 'X' else 'X' 
+            if jogadas == 9:
+                show_tabuleiro()
+                print(f'Deu Velha!!')
+                menu()
+                break
+
+            jogadas += 1
+            jogador = 'O' if jogador == 'X' else 'X' 
